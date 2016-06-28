@@ -77,8 +77,14 @@ def respondToInput(in_char_num, gameState):
 def refreshScreen(screen, gameState):
     #log("Refreshing screen\n")
     screen.erase()
-    y,x = gameState.getCharPos()
+    gameState.tick()
+
+    #draw noise
+    log("screen tick,  noise: " + str(gameState.getNoise()) + "\n")
+
+    y, x = gameState.getCharPos()
     screen.addch(y, x, ord('@'))
+
 
 #input is captured constantly but screen refreshes on interval
 # no-sleep version of process loop
