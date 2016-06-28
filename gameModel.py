@@ -1,5 +1,7 @@
 import random
 
+SPAWN_MIN = 2
+SPAWN_MAX = 15
 
 class Character():
     def __init__(self, y, x):
@@ -59,8 +61,8 @@ class Game():
         self.noise = [sp for sp in self.noise if sp.inbounds]
 
         if self.nextNoiseTick <= 0:
-            self.nextNoiseTick = random.randint(10, 40)
-            self.noise.append(Speck(self.maxY, self.maxX))
+            self.nextNoiseTick = random.randint(SPAWN_MIN, SPAWN_MAX)
+            self.noise.append(Speck(self.maxY-1, self.maxX-1))
 
         self.nextNoiseTick -= 1
 

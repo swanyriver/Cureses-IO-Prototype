@@ -72,6 +72,7 @@ def respondToInput(in_char_num, gameState):
         log("Respond to input" + str(positionDelta) + "\n")
 
         gameState.moveCharecter(*positionDelta)
+        log("character at: %s\n"%(str(gameState.getCharPos())))
 
 
 def refreshScreen(screen, gameState):
@@ -79,17 +80,30 @@ def refreshScreen(screen, gameState):
     screen.erase()
     gameState.tick()
 
-    #draw noise
-    log("screen tick,  noise: " + str(gameState.getNoise()) + "\n")
+    #TODO attempting to addch at the same position caused exception, set up try/catch or a predraw canvas array to handle overlap
+    alreadyDrawn = set()
 
     y, x = gameState.getCharPos()
     screen.addch(y, x, ord('@'))
+    alreadyDrawn.add((y,x))
+
+    #draw noise
+    #log("screen tick,  noise: " + str(gameState.getNoise()) + "\n")
+    for speck in gameState.getNoise():
+        if speck in alreadyDrawn: continue
+        y,x = speck
+        #log("speck y:%d, x:%d  alreadydrawn:%s\n"%(y,x, str(alreadyDrawn)))
+        screen.addch(y, x, ord('#'))
+        alreadyDrawn.add(speck)
+
+
 
 
 #input is captured constantly but screen refreshes on interval
 # no-sleep version of process loop
+# todo continuous input appears to increases frame rate, rectify?  suprising because refreshScreen should not be called on every processed input
 def constantInputReadLoop(screen, game):
-    log("constant input loop initiated")
+    log("constant input loop initiated\n")
     lastRefresh = time.time()
     while True:
         # primary input and output loop
@@ -111,7 +125,7 @@ def constantInputReadLoop(screen, game):
 #   if key inputs are not made to be one-press-one-action then there is a batching effect that leads to a delay between
 #   lifting key and movement stopping
 def sleepLoop(screen, game):
-    log("SleepLoop initiated")
+    log("SleepLoop initiated\n")
     while True:
         time.sleep(SCREEN_REFRESH)
         char_in = screen.getch()
@@ -129,7 +143,7 @@ def sleepLoop(screen, game):
 # performs similarly to no-sleep loop, has the advantage of halting for input after all other computation is complete
 # limited to 10FPS
 def halfdelayLoop(screen, game):
-    log("HalfDelay loop initiated")
+    log("HalfDelay loop initiated\n")
     curses.nocbreak()
     refreshinTenths = int(SCREEN_REFRESH // .1) if SCREEN_REFRESH >= .1 else 1
     log("Screen Refresh Rate: %d tenths of a second\n"%refreshinTenths)
