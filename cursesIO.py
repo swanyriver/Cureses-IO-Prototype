@@ -83,12 +83,12 @@ def respondToInput(in_char_num, gameState):
 
 
 def refreshScreen(screen, gameState):
-    #sys.stderr.write("Refreshing screen\n")
+    sys.stderr.write("Refreshing screen\n")
 
 
 #input is captured constantly but screen refreshes on interval
 # no-sleep version of process loop
-def constantInputReadLoop(screen):
+def constantInputReadLoop(screen, game):
     lastRefresh = time.time()
     while True:
         # primary input and output loop
@@ -106,7 +106,47 @@ def constantInputReadLoop(screen):
             refreshScreen(myScreen, None)
 
 
+# input is processed and screen is refreshed each 'tick'
+def sleepLoop(screen, game):
+    while True:
+        time.sleep(SCREEN_REFRESH)
+        char_in = screen.getch()
+        if control_scheme.get(char_in) == ACTIONS.quit:
+            break
+        if char_in != curses.ERR:
+            sys.stderr.write("input: %r %s %r\n" %
+                             (char_in, chr(char_in) if 0 <= char_in < 256 else "{Non Ascii}",
+                              curses.keyname(char_in)))
+        respondToInput(char_in, game)
+        refreshScreen(myScreen, game)
+
+
+# use halfdelay input method,  breaks for input but only for specified time in tenths of a second
+# performs similarly to no-sleep loop, has the advantage of halting for input after all other computation is complete
+def halfdelayLoop(screen, game):
+    sys.stderr.write("HalfDelay loop initiated")
+    curses.nocbreak()
+    refreshinTenths = int(SCREEN_REFRESH // .1)
+    sys.stderr.write("Screen Refresh Rate: %d tenths of a second\n"%refreshinTenths)
+    curses.halfdelay(refreshinTenths)
+    while True:
+        char_in = screen.getch()
+        if control_scheme.get(char_in) == ACTIONS.quit:
+            break
+        if char_in != curses.ERR:
+            sys.stderr.write("input: %r %s %r\n" %
+                             (char_in, chr(char_in) if 0 <= char_in < 256 else "{Non Ascii}",
+                              curses.keyname(char_in)))
+        respondToInput(char_in, game)
+        refreshScreen(myScreen, game)
+
+
 if __name__ == '__main__':
     myScreen = startCurses()
-    constantInputReadLoop(myScreen)
+
+    #myScreen.getmaxyx()
+
+    #constantInputReadLoop(myScreen, None)
+    #sleepLoop(myScreen, None)
+    halfdelayLoop(myScreen, None)
     exitCurses(myScreen)
