@@ -20,25 +20,6 @@ class ACTIONS():
     right = 4
     quit = 5
 
-# # TODO map inputs to action enums
-# #inputEnum = ["up","down","left","right"]
-#
-# control_key_scheme = {
-#     "up": curses.KEY_UP,
-#     "down": curses.KEY_DOWN,
-#     "left": curses.KEY_LEFT,
-#     "right": curses.KEY_RIGHT,
-#     "quit": 27 #escape key
-# }
-#
-# ascii_key_scheme = {
-#     "up": ord('w'),
-#     "down": ord('s'),
-#     "left": ord('a'),
-#     "right": ord('d'),
-#     "quit": ord('q')
-# }
-
 # int to int, mapping keyboard key to action enum
 control_scheme = {
     curses.KEY_UP:ACTIONS.up,
@@ -55,7 +36,7 @@ control_scheme = {
 
 directional_change = {
     ACTIONS.left:(0,-1),
-    ACTIONS.right:(1,0),
+    ACTIONS.right:(0,1),
     ACTIONS.up:(-1,0),
     ACTIONS.down:(1,0)
 }
@@ -71,6 +52,7 @@ def startCurses():
     curses.cbreak()
     screen.keypad(ON)
     screen.nodelay(ON)
+    curses.curs_set(OFF)
     return screen
 
 
@@ -78,6 +60,7 @@ def exitCurses(screen):
     curses.nocbreak();
     screen.keypad(OFF);
     screen.nodelay(OFF)
+    curses.curs_set(ON)
     curses.echo()
     curses.endwin()
 
@@ -88,10 +71,14 @@ def respondToInput(in_char_num, gameState):
         positionDelta = directional_change.get(action, (0, 0))
         log("Respond to input" + str(positionDelta) + "\n")
 
+        gameState.moveCharecter(*positionDelta)
+
 
 def refreshScreen(screen, gameState):
-    log("Refreshing screen\n")
-
+    #log("Refreshing screen\n")
+    screen.erase()
+    y,x = gameState.getCharPos()
+    screen.addch(y, x, ord('@'))
 
 #input is captured constantly but screen refreshes on interval
 # no-sleep version of process loop
@@ -108,10 +95,10 @@ def constantInputReadLoop(screen, game):
                              (char_in, chr(char_in) if 0 <= char_in < 256 else "{Non Ascii}",
                               curses.keyname(char_in)))
 
-        respondToInput(char_in, None)
+        respondToInput(char_in, game)
         if time.time() - lastRefresh > SCREEN_REFRESH:
             lastRefresh = time.time()
-            refreshScreen(myScreen, None)
+            refreshScreen(myScreen, game)
 
 
 # input is processed and screen is refreshed each 'tick'
