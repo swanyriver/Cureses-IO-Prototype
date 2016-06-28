@@ -59,6 +59,10 @@ directional_change = {
 }
 
 
+def log(str):
+    sys.stderr.write(str)
+
+
 def startCurses():
     screen = curses.initscr()
     curses.noecho()
@@ -75,15 +79,16 @@ def exitCurses(screen):
     curses.echo()
     curses.endwin()
 
+
 def respondToInput(in_char_num, gameState):
     action = control_scheme.get(in_char_num)
     if action:
         positionDelta = directional_change.get(action, (0, 0))
-        sys.stderr.write("Respond to input" + str(positionDelta) + "\n")
+        log("Respond to input" + str(positionDelta) + "\n")
 
 
 def refreshScreen(screen, gameState):
-    sys.stderr.write("Refreshing screen\n")
+    log("Refreshing screen\n")
 
 
 #input is captured constantly but screen refreshes on interval
@@ -96,7 +101,7 @@ def constantInputReadLoop(screen, game):
         if control_scheme.get(char_in) == ACTIONS.quit:
             break
         if char_in != curses.ERR:
-            sys.stderr.write("input: %r %s %r\n" %
+            log("input: %r %s %r\n" %
                              (char_in, chr(char_in) if 0 <= char_in < 256 else "{Non Ascii}",
                               curses.keyname(char_in)))
 
@@ -114,7 +119,7 @@ def sleepLoop(screen, game):
         if control_scheme.get(char_in) == ACTIONS.quit:
             break
         if char_in != curses.ERR:
-            sys.stderr.write("input: %r %s %r\n" %
+            log("input: %r %s %r\n" %
                              (char_in, chr(char_in) if 0 <= char_in < 256 else "{Non Ascii}",
                               curses.keyname(char_in)))
         respondToInput(char_in, game)
@@ -124,17 +129,17 @@ def sleepLoop(screen, game):
 # use halfdelay input method,  breaks for input but only for specified time in tenths of a second
 # performs similarly to no-sleep loop, has the advantage of halting for input after all other computation is complete
 def halfdelayLoop(screen, game):
-    sys.stderr.write("HalfDelay loop initiated")
+    log("HalfDelay loop initiated")
     curses.nocbreak()
     refreshinTenths = int(SCREEN_REFRESH // .1)
-    sys.stderr.write("Screen Refresh Rate: %d tenths of a second\n"%refreshinTenths)
+    log("Screen Refresh Rate: %d tenths of a second\n"%refreshinTenths)
     curses.halfdelay(refreshinTenths)
     while True:
         char_in = screen.getch()
         if control_scheme.get(char_in) == ACTIONS.quit:
             break
         if char_in != curses.ERR:
-            sys.stderr.write("input: %r %s %r\n" %
+            log("input: %r %s %r\n" %
                              (char_in, chr(char_in) if 0 <= char_in < 256 else "{Non Ascii}",
                               curses.keyname(char_in)))
         respondToInput(char_in, game)
