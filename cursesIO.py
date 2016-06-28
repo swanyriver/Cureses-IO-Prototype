@@ -3,12 +3,14 @@
 import curses
 import sys
 import time
+from gameModel import Game
 
 # Macros for curses magic number functions
 ON = 1
 OFF = 0
 
 SCREEN_REFRESH = .25 # 4-FPS
+SCREEN_REFRESH = .05
 
 # sadly there is no Enum class or pattern in python 2.x so this class will need to be used with extreme caution
 class ACTIONS():
@@ -52,10 +54,10 @@ control_scheme = {
 }
 
 directional_change = {
-    ACTIONS.left:(-1,0),
+    ACTIONS.left:(0,-1),
     ACTIONS.right:(1,0),
-    ACTIONS.up:(0,-1),
-    ACTIONS.down:(0,1)
+    ACTIONS.up:(-1,0),
+    ACTIONS.down:(1,0)
 }
 
 
@@ -94,6 +96,7 @@ def refreshScreen(screen, gameState):
 #input is captured constantly but screen refreshes on interval
 # no-sleep version of process loop
 def constantInputReadLoop(screen, game):
+    log("constant input loop initiated")
     lastRefresh = time.time()
     while True:
         # primary input and output loop
@@ -113,6 +116,7 @@ def constantInputReadLoop(screen, game):
 
 # input is processed and screen is refreshed each 'tick'
 def sleepLoop(screen, game):
+    log("SleepLoop initiated")
     while True:
         time.sleep(SCREEN_REFRESH)
         char_in = screen.getch()
@@ -128,10 +132,11 @@ def sleepLoop(screen, game):
 
 # use halfdelay input method,  breaks for input but only for specified time in tenths of a second
 # performs similarly to no-sleep loop, has the advantage of halting for input after all other computation is complete
+# limited to 10FPS
 def halfdelayLoop(screen, game):
     log("HalfDelay loop initiated")
     curses.nocbreak()
-    refreshinTenths = int(SCREEN_REFRESH // .1)
+    refreshinTenths = int(SCREEN_REFRESH // .1) if SCREEN_REFRESH >= .1 else 1
     log("Screen Refresh Rate: %d tenths of a second\n"%refreshinTenths)
     curses.halfdelay(refreshinTenths)
     while True:
@@ -149,9 +154,20 @@ def halfdelayLoop(screen, game):
 if __name__ == '__main__':
     myScreen = startCurses()
 
-    #myScreen.getmaxyx()
+    myGame = Game(*myScreen.getmaxyx())
 
-    #constantInputReadLoop(myScreen, None)
-    #sleepLoop(myScreen, None)
-    halfdelayLoop(myScreen, None)
+    if len(sys.argv) > 1 and str.isdigit(sys.argv[1]):
+        selectedLoop = int(sys.argv[1])
+    else:
+        selectedLoop = None
+
+    if selectedLoop == 1:
+        constantInputReadLoop(myScreen, myGame)
+    elif selectedLoop == 2:
+        sleepLoop(myScreen, myGame)
+    elif selectedLoop == 3:
+        halfdelayLoop(myScreen, myGame)
+    else:
+        constantInputReadLoop(myScreen, myGame)
+
     exitCurses(myScreen)
