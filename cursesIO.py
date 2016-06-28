@@ -2,13 +2,13 @@
 
 import curses
 import sys
+import time
 
 # Macros for curses magic number functions
 ON = 1
 OFF = 0
 
 SCREEN_REFRESH = .25 # 4-FPS
-
 
 # sadly there is no Enum class or pattern in python 2.x so this class will need to be used with extreme caution
 class ACTIONS():
@@ -83,10 +83,13 @@ def respondToInput(in_char_num, gameState):
 
 
 def refreshScreen(screen, gameState):
-    pass
+    #sys.stderr.write("Refreshing screen\n")
 
 
+#input is captured constantly but screen refreshes on interval
+# no-sleep version of process loop
 def constantInputReadLoop(screen):
+    lastRefresh = time.time()
     while True:
         # primary input and output loop
         char_in = screen.getch()
@@ -98,7 +101,9 @@ def constantInputReadLoop(screen):
                               curses.keyname(char_in)))
 
         respondToInput(char_in, None)
-        refreshScreen(myScreen, None)
+        if time.time() - lastRefresh > SCREEN_REFRESH:
+            lastRefresh = time.time()
+            refreshScreen(myScreen, None)
 
 
 if __name__ == '__main__':
