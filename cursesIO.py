@@ -102,6 +102,8 @@ def constantInputReadLoop(screen, game):
 
 
 # input is processed and screen is refreshed each 'tick'
+#   if key inputs are not made to be one-press-one-action then there is a batching effect that leads to a delay between
+#   lifting key and movement stopping
 def sleepLoop(screen, game):
     log("SleepLoop initiated")
     while True:
