@@ -17,8 +17,8 @@ class Speck():
         self.ymax = ymax
         self.xmax = xmax
 
-        self.xdelta = random.randint(-4,4)
-        self.ydelta = random.randint(-4,4)
+        self.xdelta = random.choice(range(-6,0) + range(1, 6))
+        self.ydelta = random.choice(range(-6,0) + range(1, 6))
 
         if random.choice((True, False)):
             # put on side walls
