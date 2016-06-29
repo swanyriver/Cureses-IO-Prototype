@@ -17,3 +17,9 @@ input is gathered and processed each time the screen is refreshed
 python cursesIO.py 3 2>/dev/null
 halfbreak method is used, input is waited for but input times out after n-Tenths of a second (not viable)
 
+
+Controls:
+wasd or arrow keys for movement (of the blue spaceship)
+q or ESC to quit
+
+be careful, if you quit with ctrl-c the terminal might be left in unusable state :(
