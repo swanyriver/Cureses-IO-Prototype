@@ -87,7 +87,10 @@ def refreshScreen(screen, gameState):
     alreadyDrawn = set()
 
     y, x = gameState.getCharPos()
-    screen.addch(y, x, ord('@'), curses.color_pair(1))
+    #screen.addch(y, x, ord('@'), curses.color_pair(1))
+    for line in gameState.getCharacterDrawing():
+        screen.addstr(y, x, line, curses.color_pair(1))
+        y += 1
     alreadyDrawn.add((y,x))
 
     #draw noise

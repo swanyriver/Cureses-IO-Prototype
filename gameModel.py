@@ -9,6 +9,15 @@ class Character():
     def __init__(self, y, x):
         self.x = x
         self.y = y
+        self.width = 5
+        self.height = 4
+
+    def getDrawing(self):
+        return ["  *  ",
+                " <*> ",
+                "<***>",
+                " ^ ^ "]
+
 
 
 class Speck():
@@ -55,9 +64,9 @@ class Game():
 
     #this is a request from the controller, not an imitative, game model will determine if move is possible
     def moveCharecter(self, ydelta, xdelta):
-        if 0 <= self.character.x + xdelta < self.maxX:
+        if 0 <= self.character.x + xdelta < self.maxX - self.character.width:
             self.character.x += xdelta
-        if 0 <= self.character.y + ydelta < self.maxY:
+        if 0 <= self.character.y + ydelta < self.maxY - self.character.height:
             self.character.y += ydelta
 
     def tick(self):
@@ -74,3 +83,6 @@ class Game():
 
     def getNoise(self):
         return [(sp.y, sp.x) for sp in self.noise]
+
+    def getCharacterDrawing(self):
+        return self.character.getDrawing()
