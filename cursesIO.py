@@ -53,6 +53,9 @@ def startCurses():
     screen.keypad(ON)
     screen.nodelay(ON)
     curses.curs_set(OFF)
+    curses.start_color()
+    curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_BLACK)
+    curses.init_pair(2, curses.COLOR_YELLOW, curses.COLOR_YELLOW)
     return screen
 
 
@@ -84,7 +87,7 @@ def refreshScreen(screen, gameState):
     alreadyDrawn = set()
 
     y, x = gameState.getCharPos()
-    screen.addch(y, x, ord('@'))
+    screen.addch(y, x, ord('@'), curses.color_pair(1))
     alreadyDrawn.add((y,x))
 
     #draw noise
@@ -93,7 +96,7 @@ def refreshScreen(screen, gameState):
         if speck in alreadyDrawn: continue
         y,x = speck
         #log("speck y:%d, x:%d  alreadydrawn:%s\n"%(y,x, str(alreadyDrawn)))
-        screen.addch(y, x, ord('#'))
+        screen.addch(y, x, ord('#'), curses.color_pair(2))
         alreadyDrawn.add(speck)
 
 
@@ -141,7 +144,7 @@ def sleepLoop(screen, game):
 
 # use halfdelay input method,  breaks for input but only for specified time in tenths of a second
 # performs similarly to no-sleep loop, has the advantage of halting for input after all other computation is complete
-# limited to 10FPS
+# limited to 10FPS  # very noticeable frame stuttering
 def halfdelayLoop(screen, game):
     log("HalfDelay loop initiated\n")
     curses.nocbreak()

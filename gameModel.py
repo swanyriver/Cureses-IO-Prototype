@@ -1,7 +1,9 @@
 import random
 
-SPAWN_MIN = 2
-SPAWN_MAX = 15
+SPAWN_MIN_TIME = 2
+SPAWN_MAX_TIME = 15
+SPAWN_MIN = 1
+SPAWN_MAX = 5
 
 class Character():
     def __init__(self, y, x):
@@ -34,6 +36,9 @@ class Speck():
         self.inbounds = 0 <= self.x <= self.xmax and 0 <= self.y <= self.ymax
 
 
+#todo the game x/y bounds and the render x/y bounds must be kept seperate
+#todo respond to user resize events (getch KEY_RESIZE) (or just beg the prof not to resize in the middle of a game) in view controler
+#todo at the very least ensure that drawing out of bounds does not crash the game
 class Game():
     def __init__(self, height, width):
         self.character = Character(height // 2, width // 2)
@@ -61,8 +66,9 @@ class Game():
         self.noise = [sp for sp in self.noise if sp.inbounds]
 
         if self.nextNoiseTick <= 0:
-            self.nextNoiseTick = random.randint(SPAWN_MIN, SPAWN_MAX)
-            self.noise.append(Speck(self.maxY-1, self.maxX-1))
+            self.nextNoiseTick = random.randint(SPAWN_MIN_TIME, SPAWN_MAX_TIME)
+            for _ in range(random.randint(SPAWN_MIN, SPAWN_MAX)):
+                self.noise.append(Speck(self.maxY-1, self.maxX-1))
 
         self.nextNoiseTick -= 1
 
